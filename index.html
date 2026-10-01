@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alpha Blendz Barbershop · San Juan, Texas</title>
+<meta name="description" content="Alpha Blendz barbershop in San Juan, Texas. Fades, tapers, beards, and kids cuts at 1210 N Raul Longoria Rd. Book a chair in a few taps.">
+<meta name="theme-color" content="#0d0d0d">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Alpha Blendz Barbershop">
+<meta property="og:description" content="Fades, tapers, beards, and kids cuts in San Juan, Texas. Book a chair.">
+<meta property="og:image" content="assets/og.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+<div class="curtain" id="curtain" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+
+<a class="skip" href="#book" data-i18n="skip">Skip to booking</a>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top">Alpha<em>Blendz</em></a>
+  <nav class="navlinks" id="navlinks">
+    <a href="#cuts" data-i18n="nav.cuts">Cuts</a>
+    <a href="#reel" data-i18n="nav.shop">The shop</a>
+    <a href="#visit" data-i18n="nav.visit">Visit</a>
+    <a class="nav-cta" href="#book"><span data-i18n="nav.book">Book a chair</span></a>
+  </nav>
+  <div class="lang" id="lang" role="group">
+    <button type="button" data-set-lang="en">EN</button>
+    <button type="button" data-set-lang="es">ES</button>
+  </div>
+  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="navlinks" data-i18n="nav.menu">Menu</button>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="status" id="status">San Juan, Texas</p>
+      <h1>
+        <span class="line"><span data-i18n="hero.l1">Stay</span></span>
+        <span class="line"><span data-i18n="hero.l2">sharp.</span></span>
+      </h1>
+      <p class="lede reveal" data-i18n="hero.lede">Fades, tapers, beards, and kids cuts on Raul Longoria. Every clip on this page was filmed in the shop.</p>
+      <div class="hero-cta reveal">
+        <a class="press" id="press" href="#book"><span data-i18n="nav.book">Book a chair</span></a>
+        <a class="quiet-link" href="#cuts" data-i18n="hero.menu">See the menu</a>
+      </div>
+      <dl class="facts reveal">
+        <div><dt data-i18n="fact.walk">Walk-ins</dt><dd data-i18n="fact.welcome">Welcome</dd></div>
+        <div><dt data-i18n="fact.rating">Rating</dt><dd data-i18n="fact.score">4.9 on Booksy</dd></div>
+        <div><dt data-i18n="fact.chairs">Chairs</dt><dd>Javi, Jeremy, Louise</dd></div>
+      </dl>
+    </div>
+
+    <div class="hero-stage">
+      <div class="pole" aria-hidden="true"></div>
+      <figure class="frame">
+        <video id="heroVideo" src="assets/hero.mp4" poster="assets/hero.jpg" muted loop playsinline preload="auto"></video>
+        <figcaption>
+          <a href="https://www.tiktok.com/@alphablendz/video/7426881347400109355" data-i18n="hero.tiktok">From his TikTok</a>
+          <button class="sound" id="sound" type="button" hidden>Sound off</button>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track" id="tickerTrack">
+      <span>Walk-ins welcome</span><b>/</b><span>Skin fades</span><b>/</b><span>Beard lineups</span><b>/</b><span>Kids cuts</span><b>/</b><span>Hot towel</span><b>/</b><span>VIP service</span><b>/</b>
+    </div>
+  </div>
+
+  <section class="cuts" id="cuts">
+    <header class="sec-head">
+      <h2 class="rise"><span data-i18n="menu.title">The menu</span></h2>
+      <p class="reveal" data-i18n="menu.note">Tap a cut and it carries into the booking below.</p>
+    </header>
+    <ul class="slices" id="slices"></ul>
+  </section>
+
+  <section class="reel" id="reel">
+    <div class="reel-pin">
+      <header class="reel-head">
+        <h2 class="rise"><span data-i18n-html="reel.title">Straight from <span class="mob-break">the shop</span></span></h2>
+        <a class="quiet-link reveal" href="https://www.tiktok.com/@alphablendz" data-i18n="reel.tiktok">All of it on TikTok</a>
+      </header>
+      <div class="reel-track" id="reelTrack">
+        <figure class="clip">
+          <video src="assets/clip-team.mp4" poster="assets/clip-team.jpg" muted loop playsinline preload="none"></video>
+          <figcaption><strong data-i18n="clip.team">The Alpha team</strong><span data-i18n="clip.team.sub">Wedding in an hour</span></figcaption>
+        </figure>
+        <figure class="clip">
+          <video src="assets/clip-taper.mp4" poster="assets/clip-taper.jpg" muted loop playsinline preload="none"></video>
+          <figcaption><strong data-i18n="clip.taper">That taper</strong><span data-i18n="clip.taper.sub">Got him cheesing</span></figcaption>
+        </figure>
+        <figure class="clip">
+          <video src="assets/clip-leveled.mp4" poster="assets/clip-leveled.jpg" muted loop playsinline preload="none"></video>
+          <figcaption><strong data-i18n="clip.level">Leveled up</strong><span data-i18n="clip.level.sub">Walk-ins welcome</span></figcaption>
+        </figure>
+        <figure class="clip">
+          <video src="assets/clip-shop.mp4" poster="assets/clip-shop.jpg" muted loop playsinline preload="none"></video>
+          <figcaption><strong data-i18n="clip.shop">Inside the shop</strong><span data-i18n="clip.shop.sub">Six chairs, no wait</span></figcaption>
+        </figure>
+        <figure class="clip">
+          <video src="assets/clip-chair.mp4" poster="assets/clip-chair.jpg" muted loop playsinline preload="none"></video>
+          <figcaption><strong data-i18n="clip.chair">In the chair</strong><span data-i18n="clip.chair.sub">Line it up</span></figcaption>
+        </figure>
+        <figure class="clip">
+          <video src="assets/clip-quick.mp4" poster="assets/clip-quick.jpg" muted loop playsinline preload="none"></video>
+          <figcaption><strong data-i18n="clip.fresh">Fresh again</strong><span data-i18n="clip.fresh.sub">Every two weeks</span></figcaption>
+        </figure>
+      </div>
+      <div class="reel-foot" aria-hidden="true">
+        <p class="reel-hint" id="reelHint" data-i18n="reel.hint">Keep scrolling</p>
+        <div class="reel-rail"><span id="reelBar"></span></div>
+        <p class="reel-count" id="reelCount">01 / 06</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="proof">
+    <p class="score" id="score" data-to="4.9">0.0</p>
+    <div class="proof-copy">
+      <p class="label" data-i18n="proof.reviews">31 reviews on Booksy</p>
+      <blockquote><p data-i18n="proof.quote">“Ask for Javi. He actually listens, and you leave the chair feeling sharp.”</p></blockquote>
+      <p class="label" data-i18n="proof.by">A client, November 2025</p>
+    </div>
+  </section>
+
+  <section class="book" id="book">
+    <header class="sec-head">
+      <h2 class="rise"><span data-i18n="book.title">Book a chair</span></h2>
+      <p class="reveal" data-i18n="book.note">Four steps. This demo keeps the hold in this browser, so nothing reaches the shop yet.</p>
+    </header>
+    <div class="desk" id="desk"></div>
+  </section>
+
+  <section class="visit" id="visit">
+    <h2 class="rise"><span data-i18n="visit.title">Come see us</span></h2>
+    <div class="visit-grid">
+      <figure class="storefront reveal">
+        <img src="assets/storefront.jpg" alt="The Alpha Blendz storefront on North Raul Longoria Road, with the barber pole in the window" loading="lazy" width="540" height="960">
+        <figcaption data-i18n="visit.pole">Look for the pole</figcaption>
+      </figure>
+      <div class="reveal">
+        <h3 data-i18n="visit.address">Address</h3>
+        <p>1210 N Raul Longoria Rd<br>San Juan, TX 78589</p>
+        <a class="seam" href="https://maps.google.com/?q=1210+N+Raul+Longoria+Rd+San+Juan+TX+78589"><span data-i18n="visit.directions">Get directions</span><i aria-hidden="true"></i></a>
+      </div>
+      <div class="reveal">
+        <h3 data-i18n="visit.hours">Hours</h3>
+        <ul class="hours" id="hours"></ul>
+      </div>
+      <div class="reveal">
+        <h3 data-i18n="visit.reach">Reach the shop</h3>
+        <a class="tel" href="tel:+19562231809">956.223.1809</a>
+        <ul class="social">
+          <li><a href="https://www.tiktok.com/@alphablendz">TikTok</a></li>
+          <li><a href="https://www.facebook.com/p/Alpha-Blendz-Barbershop-61557053699693/">Facebook</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p class="foot-mark">Alpha<em>Blendz</em></p>
+  <p>1210 N Raul Longoria Rd, San Juan, Texas</p>
+</footer>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BarberShop",
+  "name": "Alpha Blendz Barbershop",
+  "telephone": "+1-956-223-1809",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "1210 N Raul Longoria Rd",
+    "addressLocality": "San Juan",
+    "addressRegion": "TX",
+    "postalCode": "78589",
+    "addressCountry": "US"
+  },
+  "sameAs": [
+    "https://www.tiktok.com/@alphablendz",
+    "https://www.facebook.com/p/Alpha-Blendz-Barbershop-61557053699693/"
+  ],
+  "openingHours": ["Mo-Fr 10:00-19:00", "Sa-Su 10:00-17:00"]
+}
+</script>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
