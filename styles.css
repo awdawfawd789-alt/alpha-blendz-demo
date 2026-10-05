@@ -325,20 +325,6 @@ dd { margin: 0; font-weight: 500; }
 }
 .frame figcaption a { color: var(--mute); text-decoration: none; border-bottom: 1px solid var(--red); }
 .frame figcaption a:hover { color: var(--paper); }
-.sound {
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--mute);
-  font: inherit;
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 0.3rem 0.5rem;
-  cursor: pointer;
-}
-.sound:hover { color: var(--paper); border-color: var(--red); }
-
 /* ---------- ticker ---------- */
 .ticker {
   overflow: hidden;

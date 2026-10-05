@@ -323,31 +323,11 @@ function bootReveals() {
 
 function bootHeroVideo() {
   const video = $("#heroVideo");
-  const sound = $("#sound");
   if (!video) return;
 
-  const tryPlay = () => video.play().catch(() => { /* blocked until a gesture */ });
+  const tryPlay = () => video.play().catch(() => { /* browser autoplay policy */ });
   if (video.readyState >= 2) tryPlay();
   video.addEventListener("loadeddata", tryPlay, { once: true });
-
-  video.addEventListener("loadedmetadata", () => {
-    const hasAudio = video.mozHasAudio
-      || Boolean(video.webkitAudioDecodedByteCount)
-      || Boolean(video.audioTracks && video.audioTracks.length);
-    if (hasAudio || video.webkitAudioDecodedByteCount === undefined) sound.hidden = false;
-  }, { once: true });
-
-  sound.addEventListener("click", () => {
-    video.muted = !video.muted;
-    sound.textContent = video.muted ? copy("sound.off") : copy("sound.on");
-    if (!video.muted) tryPlay();
-  });
-
-  // clicking the frame also toggles playback
-  video.addEventListener("click", () => {
-    if (video.paused) tryPlay();
-    else video.pause();
-  });
 }
 
 /* ---------------- clip videos play in view ---------------- */
@@ -756,11 +736,6 @@ function applyStatic() {
     button.classList.toggle("on", on);
     button.setAttribute("aria-pressed", on ? "true" : "false");
   });
-  const sound = $("#sound");
-  const video = $("#heroVideo");
-  if (sound && video && !sound.hidden) {
-    sound.textContent = video.muted ? copy("sound.off") : copy("sound.on");
-  }
 }
 
 function bootLang() {
