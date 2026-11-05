@@ -19,15 +19,8 @@ const SHOP = {
     { id: "shave", name: "Head shave", price: 30, minutes: 30, note: "Clean, even, and close." },
     { id: "vip", name: "VIP service", price: 100, minutes: 60, note: "Cut, beard, facial, brows, and a wash." },
   ],
-  barbers: [
-    { id: "any", name: "First open chair", note: "Whoever is free soonest." },
-    { id: "javi", name: "Javi", note: "Listens, then lines it up." },
-    { id: "jeremy", name: "Jeremy", note: "The chair people ask for." },
-    { id: "louise", name: "Louise", note: "Clean lines, calm shop." },
-  ],
 };
 
-const STORE = "alphablendz-holds-v2";
 const LANG_KEY = "alphablendz-lang";
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const browserLang = (navigator.language || "en").toLowerCase().startsWith("es") ? "es" : "en";
@@ -58,8 +51,6 @@ function dayShort(index) {
 
 function svcName(item) { return copy(`svc.${item.id}.name`); }
 function svcNote(item) { return copy(`svc.${item.id}.note`); }
-function barberName(item) { return copy(`barber.${item.id}.name`); }
-function barberNote(item) { return copy(`barber.${item.id}.note`); }
 
 /* ---------------- helpers ---------------- */
 
@@ -89,57 +80,6 @@ function clock(totalMinutes) {
   const suffix = h24 >= 12 ? "PM" : "AM";
   const h12 = h24 % 12 || 12;
   return `${h12}:${String(minute).padStart(2, "0")} ${suffix}`;
-}
-
-function service(id) {
-  return SHOP.services.find((item) => item.id === id);
-}
-
-function barber(id) {
-  return SHOP.barbers.find((item) => item.id === id);
-}
-
-function loadHolds() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(STORE) || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-let holds = loadHolds();
-
-function saveHolds() {
-  try {
-    localStorage.setItem(STORE, JSON.stringify(holds));
-  } catch {
-    /* private mode */
-  }
-}
-
-function openSlots(serviceId, barberId, dateIso) {
-  const svc = service(serviceId);
-  if (!svc || !dateIso) return [];
-  const window_ = SHOP.hours[fromYmd(dateIso).getDay()];
-  if (!window_) return [];
-  const now = new Date();
-  const isToday = ymd(now) === dateIso;
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-  const chairs = barberId === "any"
-    ? SHOP.barbers.filter((item) => item.id !== "any").map((item) => item.id)
-    : [barberId];
-
-  const out = [];
-  for (let start = window_[0] * 60; start + svc.minutes <= window_[1] * 60; start += 30) {
-    if (isToday && start <= nowMinutes + 15) continue;
-    const end = start + svc.minutes;
-    const free = chairs.filter((chair) => !holds.some((hold) => (
-      hold.barberId === chair && hold.date === dateIso && hold.start < end && hold.end > start
-    )));
-    if (free.length) out.push({ start, end, label: clock(start), free });
-  }
-  return out;
 }
 
 function nextDays(count = 14) {
@@ -238,21 +178,15 @@ function bootMenu() {
   const list = $("#slices");
   list.innerHTML = SHOP.services.map((svc, index) => `
     <li>
-      <button class="slice" type="button" data-service="${svc.id}">
+      <div class="slice">
         <span class="slice-num">${String(index + 1).padStart(2, "0")}</span>
         <span class="slice-name">${esc(svcName(svc))}</span>
         <span class="slice-note">${esc(svcNote(svc))}</span>
         <span class="slice-min">${svc.minutes} ${esc(copy("min"))}</span>
         <span class="slice-price" data-price="${svc.price}">${menuPriced ? `$${svc.price}` : "$0"}</span>
-      </button>
+      </div>
     </li>
   `).join("");
-
-  $$(".slice", list).forEach((button) => {
-    button.addEventListener("click", () => {
-      desk.pick(button.dataset.service);
-    });
-  });
 }
 
 /* ---------------- count ups ---------------- */
@@ -442,273 +376,6 @@ function bootMagnet() {
   }
 }
 
-/* ---------------- booking desk ---------------- */
-
-const desk = {
-  root: null,
-  step: 0,
-  serviceId: null,
-  barberId: null,
-  date: null,
-  start: null,
-  name: "",
-  phone: "",
-  error: "",
-  ticket: null,
-
-  init() {
-    this.root = $("#desk");
-    this.render();
-  },
-
-  pick(serviceId) {
-    this.serviceId = serviceId;
-    this.start = null;
-    this.step = 1;
-    this.error = "";
-    this.render();
-    this.root.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
-  },
-
-  go(step) {
-    this.step = clamp(step, 0, 3);
-    this.error = "";
-    this.render();
-  },
-
-  render() {
-    if (this.ticket) return this.renderTicket();
-    const steps = [0, 1, 2, 3]
-      .map((index) => {
-        const label = copy(`step.${index}`);
-        const cls = index === this.step ? "on" : index < this.step ? "done" : "";
-        return `<li class="${cls}"><span>${String(index + 1).padStart(2, "0")} ${esc(label)}</span></li>`;
-      }).join("");
-
-    this.root.innerHTML = `
-      <div class="desk-main">
-        <ol class="steps">${steps}</ol>
-        <div class="pane" id="pane">${this.pane()}</div>
-      </div>
-      ${this.receipt()}
-    `;
-    this.wire();
-  },
-
-  receipt() {
-    const svc = this.serviceId ? service(this.serviceId) : null;
-    const who = this.barberId ? barber(this.barberId) : null;
-    const wait = (text) => `<span class="wait">${esc(text)}</span>`;
-    let when = wait(copy("wait.time"));
-    if (this.date && this.start !== null) {
-      const date = fromYmd(this.date);
-      when = esc(`${dayShort(date.getDay())} ${date.getDate()}, ${clock(this.start)}`);
-    }
-    return `
-      <aside class="receipt" aria-live="polite">
-        <p class="label">${esc(copy("receipt.title"))}</p>
-        <dl>
-          <div><dt>${esc(copy("receipt.cut"))}</dt><dd>${svc ? esc(svcName(svc)) : wait(copy("wait.cut"))}</dd></div>
-          <div><dt>${esc(copy("receipt.chair"))}</dt><dd>${who ? esc(barberName(who)) : wait(copy("wait.chair"))}</dd></div>
-          <div><dt>${esc(copy("receipt.when"))}</dt><dd>${when}</dd></div>
-        </dl>
-        <p class="receipt-due"><span>${esc(copy("due"))}</span><b class="${svc ? "" : "wait"}">${svc ? `$${svc.price}` : "—"}</b></p>
-      </aside>
-    `;
-  },
-
-  pane() {
-    if (this.step === 0) {
-      return `
-        <h3>${esc(copy("pick.cut"))}</h3>
-        <div class="pick-grid">
-          ${SHOP.services.map((svc) => `
-            <button class="pick ${svc.id === this.serviceId ? "on" : ""}" type="button" data-service="${svc.id}">
-              <strong>${esc(svcName(svc))}</strong>
-              <span>${esc(svcNote(svc))}</span>
-              <b>$${svc.price} · ${svc.minutes} ${esc(copy("min"))}</b>
-            </button>
-          `).join("")}
-        </div>
-      `;
-    }
-
-    if (this.step === 1) {
-      return `
-        <h3>${esc(copy("pick.chair"))}</h3>
-        <div class="pick-grid">
-          ${SHOP.barbers.map((item) => `
-            <button class="pick ${item.id === this.barberId ? "on" : ""}" type="button" data-barber="${item.id}">
-              <strong>${esc(barberName(item))}</strong>
-              <span>${esc(barberNote(item))}</span>
-            </button>
-          `).join("")}
-        </div>
-        <div class="row"><button class="back" type="button" data-back="0">${esc(copy("back.cuts"))}</button></div>
-      `;
-    }
-
-    if (this.step === 2) {
-      const days = nextDays(14);
-      if (!this.date) this.date = (days.find((day) => !day.closed) || days[0]).iso;
-      const slots = openSlots(this.serviceId, this.barberId, this.date);
-      return `
-        <h3>${esc(copy("pick.day"))}</h3>
-        <div class="chips">
-          ${days.map((day) => `
-            <button class="chip ${day.iso === this.date ? "on" : ""}" type="button" data-date="${day.iso}" ${day.closed ? "disabled" : ""}>
-              ${esc(day.short)} ${day.num}<small>${day.closed ? esc(copy("day.closed")) : ""}</small>
-            </button>
-          `).join("")}
-        </div>
-        <h3>${esc(copy("pick.time"))}</h3>
-        ${slots.length ? `
-          <div class="chips">
-            ${slots.map((slot) => `
-              <button class="chip ${slot.start === this.start ? "on" : ""}" type="button" data-start="${slot.start}">${esc(slot.label)}</button>
-            `).join("")}
-          </div>` : `<p class="hint">${esc(copy("empty.day"))}</p>`}
-        <div class="row">
-          <button class="back" type="button" data-back="1">${esc(copy("back.chairs"))}</button>
-        </div>
-      `;
-    }
-
-    const svc = service(this.serviceId);
-    return `
-      <h3>${esc(copy("who"))}</h3>
-      <div class="pair">
-        <label class="field"><span>${esc(copy("field.name"))}</span><input id="fName" value="${esc(this.name)}" autocomplete="name" placeholder="${esc(copy("ph.name"))}"></label>
-        <label class="field"><span>${esc(copy("field.phone"))}</span><input id="fPhone" value="${esc(this.phone)}" autocomplete="tel" inputmode="tel" placeholder="956 000 0000"></label>
-      </div>
-      ${this.error ? `<p class="err" role="alert">${esc(copy(this.error))}</p>` : `<p class="hint">${esc(fill("hold.hint", { cut: svcName(svc).toLowerCase(), min: svc.minutes }))}</p>`}
-      <div class="row">
-        <button class="lock" type="button" id="lock">${esc(copy("lock"))}</button>
-        <button class="back" type="button" data-back="2">${esc(copy("back.times"))}</button>
-      </div>
-    `;
-  },
-
-  wire() {
-    const pane = $("#pane", this.root);
-
-    $$("[data-service]", pane).forEach((button) => button.addEventListener("click", () => {
-      this.serviceId = button.dataset.service;
-      this.start = null;
-      this.go(1);
-    }));
-
-    $$("[data-barber]", pane).forEach((button) => button.addEventListener("click", () => {
-      this.barberId = button.dataset.barber;
-      this.start = null;
-      this.go(2);
-    }));
-
-    $$("[data-date]", pane).forEach((button) => button.addEventListener("click", () => {
-      this.date = button.dataset.date;
-      this.start = null;
-      this.render();
-    }));
-
-    $$("[data-start]", pane).forEach((button) => button.addEventListener("click", () => {
-      this.start = Number(button.dataset.start);
-      this.go(3);
-    }));
-
-    $$("[data-back]", pane).forEach((button) => button.addEventListener("click", () => {
-      this.go(Number(button.dataset.back));
-    }));
-
-    const name = $("#fName", pane);
-    const phone = $("#fPhone", pane);
-    if (name) name.addEventListener("input", () => { this.name = name.value; });
-    if (phone) phone.addEventListener("input", () => { this.phone = phone.value; });
-
-    const lock = $("#lock", pane);
-    if (lock) lock.addEventListener("click", () => this.hold());
-  },
-
-  hold() {
-    const name = this.name.trim();
-    const digits = this.phone.replace(/\D/g, "");
-    const phone = digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
-
-    if (name.length < 2) {
-      this.error = "err.name";
-      return this.render();
-    }
-    if (phone.length !== 10) {
-      this.error = "err.phone";
-      return this.render();
-    }
-
-    holds = loadHolds();
-    const slot = openSlots(this.serviceId, this.barberId, this.date).find((item) => item.start === this.start);
-    if (!slot) {
-      this.error = "err.gone";
-      this.start = null;
-      this.step = 2;
-      return this.render();
-    }
-
-    const svc = service(this.serviceId);
-    const chairId = slot.free[0];
-    const code = Math.random().toString(36).replace(/[^a-z0-9]/g, "").slice(0, 6).toUpperCase();
-
-    holds.push({
-      code,
-      serviceId: svc.id,
-      barberId: chairId,
-      date: this.date,
-      start: slot.start,
-      end: slot.end,
-      name,
-      phone,
-    });
-    saveHolds();
-
-    const date = fromYmd(this.date);
-    this.ticket = {
-      code,
-      serviceId: svc.id,
-      barberId: chairId,
-      date: this.date,
-      start: slot.start,
-      price: svc.price,
-      name,
-    };
-    this.render();
-  },
-
-  renderTicket() {
-    const ticket = this.ticket;
-    const date = fromYmd(ticket.date);
-    const when = `${dayName(date.getDay())}, ${date.toLocaleDateString(lang === "es" ? "es-MX" : "en-US", { month: "short", day: "numeric" })} ${copy("ticket.at")} ${clock(ticket.start)}`;
-    this.root.innerHTML = `
-      <div class="ticket" role="status">
-        <p class="label">${esc(fill("ticket.for", { name: ticket.name }))}</p>
-        <p class="code">${esc(ticket.code)}</p>
-        <dl>
-          <div><dt>${esc(copy("receipt.cut"))}</dt><dd>${esc(svcName(service(ticket.serviceId)))}</dd></div>
-          <div><dt>${esc(copy("receipt.chair"))}</dt><dd>${esc(barberName(barber(ticket.barberId)))}</dd></div>
-          <div><dt>${esc(copy("receipt.when"))}</dt><dd>${esc(when)}</dd></div>
-          <div><dt>${esc(copy("due"))}</dt><dd>$${ticket.price}</dd></div>
-        </dl>
-        <p class="hint">${esc(copy("ticket.demo"))}</p>
-        <div class="row">
-          <button class="back" type="button" id="again">${esc(copy("ticket.again"))}</button>
-        </div>
-      </div>
-    `;
-    $("#again", this.root).addEventListener("click", () => {
-      this.ticket = null;
-      this.step = 0;
-      this.start = null;
-      this.render();
-    });
-  },
-};
-
 /* ---------------- ticker seam ---------------- */
 
 function bootTicker() {
@@ -751,7 +418,6 @@ function bootLang() {
       bootHours();
       bootMenu();
       bootTicker();
-      if (desk.root) desk.render();
     });
   });
 }
@@ -771,4 +437,3 @@ bootHeroVideo();
 bootClipPlayback();
 bootScrollRig();
 bootMagnet();
-desk.init();
