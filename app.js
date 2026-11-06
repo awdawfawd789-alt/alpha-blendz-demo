@@ -3,9 +3,9 @@
 
 const SHOP = {
   hours: {
-    0: [10, 17],
-    1: [10, 19],
-    2: [10, 19],
+    0: [12, 17],
+    1: [12, 19],
+    2: "appt",
     3: [10, 19],
     4: [10, 19],
     5: [10, 19],
@@ -88,11 +88,12 @@ function nextDays(count = 14) {
   return Array.from({ length: count }, (_, i) => {
     const date = new Date(today);
     date.setDate(date.getDate() + i);
+    const dayHours = SHOP.hours[date.getDay()];
     return {
       iso: ymd(date),
       short: dayShort(date.getDay()),
       num: date.getDate(),
-      closed: !SHOP.hours[date.getDay()],
+      closed: !Array.isArray(dayHours),
     };
   });
 }
@@ -137,7 +138,13 @@ function bootStatus() {
   const now = new Date();
   const window_ = SHOP.hours[now.getDay()];
   const minutes = now.getHours() * 60 + now.getMinutes();
-  const isOpen = window_ && minutes >= window_[0] * 60 && minutes < window_[1] * 60;
+
+  if (window_ === "appt") {
+    el.innerHTML = `<i></i>San Juan, Texas <b>${esc(copy("status.appt"))}</b>`;
+    return;
+  }
+
+  const isOpen = Array.isArray(window_) && minutes >= window_[0] * 60 && minutes < window_[1] * 60;
 
   if (isOpen) {
     el.innerHTML = `<i></i>San Juan, Texas <b>${esc(fill("status.open", { time: clock(window_[1] * 60) }))}</b>`;
@@ -146,10 +153,13 @@ function bootStatus() {
   const days = nextDays(8);
   const upcoming = days.find((day, index) => {
     if (day.closed) return false;
-    if (index === 0) return minutes < SHOP.hours[now.getDay()][0] * 60;
+    const dayHours = SHOP.hours[fromYmd(day.iso).getDay()];
+    if (!Array.isArray(dayHours)) return false;
+    if (index === 0) return minutes < dayHours[0] * 60;
     return true;
   });
-  const opensAt = upcoming ? SHOP.hours[fromYmd(upcoming.iso).getDay()][0] * 60 : null;
+  const upcomingHours = upcoming ? SHOP.hours[fromYmd(upcoming.iso).getDay()] : null;
+  const opensAt = Array.isArray(upcomingHours) ? upcomingHours[0] * 60 : null;
   const when = upcoming && upcoming.iso === ymd(now) ? copy("today") : upcoming ? upcoming.short : "";
   const label = opensAt === null
     ? copy("status.closed")
@@ -163,9 +173,14 @@ function bootHours() {
   const order = [1, 2, 3, 4, 5, 6, 0];
   list.innerHTML = order.map((day) => {
     const window_ = SHOP.hours[day];
-    const text = window_
-      ? `${clock(window_[0] * 60)} ${copy("hours.to")} ${clock(window_[1] * 60)}`
-      : copy("hours.closed");
+    let text;
+    if (Array.isArray(window_)) {
+      text = `${clock(window_[0] * 60)} ${copy("hours.to")} ${clock(window_[1] * 60)}`;
+    } else if (window_ === "appt") {
+      text = copy("hours.appt");
+    } else {
+      text = copy("hours.closed");
+    }
     const mark = day === today ? ' class="today"' : "";
     const value = day === today ? `<b>${esc(text)}</b>` : esc(text);
     return `<li${mark}><span>${esc(dayName(day))}</span><span>${value}</span></li>`;

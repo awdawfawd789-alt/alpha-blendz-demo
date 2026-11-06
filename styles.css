@@ -535,6 +535,7 @@ dd { margin: 0; font-weight: 500; }
 .hours li.today { color: var(--paper); }
 .hours li.today b { color: var(--red); }
 .hours span:first-child { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.hours span:last-child { text-align: right; }
 
 .seam {
   display: inline-flex;
