@@ -4,7 +4,7 @@
 const SHOP = {
   /* The shop's Booksy page, like https://booksy.com/en-us/<id>_alpha-blendz_barber-shop_<id>_san-juan.
      Fill this in and the Book buttons switch on. Leave it empty until the real link is known. */
-  booksyUrl: "",
+  booksyUrl: "https://booksy.com/en-us/1200599_alpha-blendz-barbershop_barber-shop_36868_san-juan",
   hours: {
     0: [12, 17],
     1: [12, 19],
