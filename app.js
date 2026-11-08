@@ -2,6 +2,9 @@
    Shop data comes from his own TikTok bio, Facebook page, and Booksy menu. */
 
 const SHOP = {
+  /* The shop's Booksy page, like https://booksy.com/en-us/<id>_alpha-blendz_barber-shop_<id>_san-juan.
+     Fill this in and the Book buttons switch on. Leave it empty until the real link is known. */
+  booksyUrl: "",
   hours: {
     0: [12, 17],
     1: [12, 19],
@@ -202,6 +205,21 @@ function bootMenu() {
       </div>
     </li>
   `).join("");
+}
+
+/* ---------------- booking (Booksy) ---------------- */
+
+function bootBooking() {
+  const url = /^https:\/\/([a-z0-9-]+\.)?booksy\.com\//i.test(SHOP.booksyUrl) ? SHOP.booksyUrl : "";
+  const embed = $("#bookEmbed");
+  const hasWidget = Boolean(embed && embed.children.length > 0);
+
+  $$("[data-book]").forEach((el) => {
+    if (url) el.href = url;
+    el.hidden = !url;
+  });
+  const soon = $("#bookSoon");
+  if (soon) soon.hidden = Boolean(url) || hasWidget;
 }
 
 /* ---------------- count ups ---------------- */
@@ -445,6 +463,7 @@ bootLang();
 bootStatus();
 bootHours();
 bootMenu();
+bootBooking();
 bootTicker();
 bootCounters();
 bootReveals();

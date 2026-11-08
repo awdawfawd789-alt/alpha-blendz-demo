@@ -348,7 +348,21 @@ dd { margin: 0; font-weight: 500; }
 @keyframes slide { to { transform: translateX(-50%); } }
 
 /* ---------- sections ---------- */
-.cuts, .visit, .proof { padding: clamp(3.5rem, 9vh, 7rem) var(--gutter); }
+[hidden] { display: none !important; }
+.cuts, .visit, .proof, .book { padding: clamp(3.5rem, 9vh, 7rem) var(--gutter); }
+
+/* booking: Booksy widget slot, with a call fallback */
+.book { border-top: 1px solid var(--line); }
+.book-panel {
+  display: grid;
+  gap: 1.4rem;
+  max-width: 52rem;
+  border-left: 1px solid var(--red);
+  padding-left: clamp(1rem, 2.5vw, 2rem);
+}
+.book-embed:empty { display: none; }
+.book-soon { margin: 0; max-width: 44ch; color: #d9d7d2; }
+.book-actions { display: flex; align-items: center; gap: 1.6rem; flex-wrap: wrap; }
 .sec-head { margin-bottom: 2.2rem; max-width: 46ch; }
 .sec-head h2 { margin-bottom: 0.3em; }
 .sec-head p { margin: 0; }
